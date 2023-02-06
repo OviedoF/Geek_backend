@@ -34,12 +34,12 @@ categoriesControllers.getCategoryById = async (req, res) => {
 
 categoriesControllers.createCategory = async (req, res) => {
     try {
-        const {filename} = req.files[0];
-        const {name} = req.body;
+        const {filename} = req.files.images[0];
+        console.log(req.files)
         const imageUrl = `${process.env.ROOT_URL}/images/${filename}`;
 
         const newCategory = new Category({
-            name: capitalize(name),
+            ...req.body,
             imageUrl
         })
 
@@ -51,7 +51,7 @@ categoriesControllers.createCategory = async (req, res) => {
         })
     } catch (error) {
         console.log(error);
-        return res.status(500).send(error);
+        res.status(500).send(error);
     }
 };
 

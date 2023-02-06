@@ -9,6 +9,10 @@ const categorySchema = new Schema({
         type: String,
         required: true
     },
+    description: {
+        type: String,
+        required: true
+    },
     subCategories: [{
         ref: "SubCategory",
         type: Schema.Types.ObjectId
