@@ -8,7 +8,7 @@ router.get('/category/:category', productsControllers.getProductsByCategory);
 router.get('/:id', productsControllers.getProductById);
 
 router.post('/filters', productsControllers.filterAndGetProducts);
-router.post('/create', productsControllers.createProduct);
+router.post('/', productsControllers.createProduct);
 router.post('/:id/addImage', productsControllers.pushImage);
 
 router.put('/:id/principalImage', productsControllers.updatePrincipalImage);

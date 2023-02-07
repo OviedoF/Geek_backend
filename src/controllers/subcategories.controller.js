@@ -47,14 +47,13 @@ subCategoriesControllers.getSubcategoryByFather = async (req, res) => {
 
 subCategoriesControllers.createSubCategory = async (req, res) => {
     try {
-        const {filename} = req.files[0];
-        const {name, category} = req.body;
+        const {filename} = req.files.images[0];
+        const {category} = req.body;
         const imageUrl = `${process.env.ROOT_URL}/images/${filename}`;
 
         const newSubCategory = new Subcategory({
-            name,
-            imageUrl,
-            category
+            ...req.body,
+            imageUrl
         })
 
         const subCategorySaved = await newSubCategory.save();

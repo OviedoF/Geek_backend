@@ -4,7 +4,7 @@ const Product = require(path.join(__dirname, '..', 'models', 'product.model.js')
 const Category = require(path.join(__dirname, '..', 'models', 'category.model.js'));
 const { capitalize } = require(path.join(__dirname, '..', 'libs', 'textHelpers'));
 const Shop = require(path.join(__dirname, '..', 'models', 'shop.model'));
-const deleteImage = require(path.join(__dirname, '..', 'libs', 'dirLibrary')); 
+const {deleteReqImages} = require(path.join(__dirname, '..', 'libs', 'dirLibrary')); 
 require('dotenv').config();
 
 const productsControllers = {};
@@ -157,22 +157,23 @@ productsControllers.filterAndGetProducts = async (req, res) => {
 
 productsControllers.createProduct = async (req, res) => {
     try {
-        const principalImage = req.files.shift();
-        const { filename } = principalImage; // req.files[0] = imágen destacada.
-        const galeryImages = [];
+        const { filename } = req.files.principalImage[0];
+        const galleryImages = req.files.galleryImages;
         const {shopid} = req.headers;
+        const galleryImagesUrls = [];
 
-        if(req.files.length >= 0 ){ 
-            req.files.forEach(el => {
-                const {filename} = el;
-                galeryImages.push(`${process.env.ROOT_URL}/images/${filename}`);
-            })
-        }
+        const shop = await Shop.findById(shopid);
+        if(!shop) return res.status(404).send({ message: 'Acceso no concedido, no tiene una tienda asociada.' })
+
+        if(galleryImages) galleryImages.forEach(image => {
+            const {filename} = image;
+            galleryImagesUrls.push(`${process.env.ROOT_URL}/images/${filename}`);
+        })
 
         const newProduct = await new Product({
             ...req.body,
             principalImage: `${process.env.ROOT_URL}/images/${filename}`,
-            galeryImages,
+            galleryImages: galleryImagesUrls,
             shop: shopid
         });
 
@@ -185,19 +186,15 @@ productsControllers.createProduct = async (req, res) => {
 
         await Shop.findByIdAndUpdate(shopid, {
             products: newProducts
-        })
+        });
 
         res.status(201).send(newProduct);
     } catch (error) {
-        req.files.forEach(el => {
-            const {filename} = el;
-            const dirname = path.join(__dirname, '..', 'public', 'images', filename);
-
-            deleteImage(dirname);
-        })
-
+        deleteReqImages(req);
         console.log(error);
-        return res.status(500).send(error);
+        return res.status(500).send({
+            message: false,
+        });
     }
 };
 

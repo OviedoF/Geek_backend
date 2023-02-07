@@ -26,7 +26,9 @@ const config = multer({
 }).fields([
     {name: 'profileImage', maxCount: 1},
     {name: 'bannerImage', maxCount: 1},
-    {name: 'images', maxCount: 10}
+    {name: 'images', maxCount: 10},
+    {name: 'principalImage', maxCount: 1},
+    {name: 'galleryImages', maxCount: 5}
 ]);
 
 module.exports = config;
