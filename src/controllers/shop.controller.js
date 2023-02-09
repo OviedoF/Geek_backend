@@ -1,18 +1,21 @@
 const path = require('path');
 require('dotenv').config();
 const User = require(path.join(__dirname, '..', 'models', 'user.model'));
-const Role = require(path.join(__dirname, '..', 'models', 'role.model'));
 const Shop = require(path.join(__dirname, '..', 'models', 'shop.model'));
-const Purchase = require(path.join(__dirname, '..', 'models', 'purchase.model'));
 const {deleteReqImages, deleteImage} = require(path.join(__dirname, '..', 'libs', 'dirLibrary'));
 
 const shopController = {};
 
 shopController.getShop = async (req, res) => {
     try {
+        const {page} = req.params;
+        const startIndex = (page*20) - 20;
+        const finishIndex = (page*20) - 1;
         const shops = await Shop.find();
+        
+        const shopsSliced = shops.slice(startIndex, finishIndex)
 
-        res.status(200).send(shops);
+        res.status(200).send(shopsSliced);
     } catch (error) {
         console.log(error);
         res.status(500).send(error);
@@ -23,8 +26,6 @@ shopController.getShopById = async (req, res) => {
     try {
         const {id} = req.params;
         const shop = await Shop.findById(id).populate(['products', 'posts', 'comments']);
-
-        // await Purchase.deleteMany({state: "En proceso"});
 
         if(!shop) res.status(404).send("Tienda no encontrada.");
 

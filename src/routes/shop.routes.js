@@ -4,7 +4,7 @@ const router = express.Router();
 const shopControllers = require(path.join(__dirname, '..', 'controllers', 'shop.controller'));
 const {checkDuplicateShop} = require(path.join(__dirname, '..', 'middlewares', 'verifyMiddleware'));
 
-router.get('/', shopControllers.getShop);
+router.get('/per-page/:page', shopControllers.getShop);
 router.get('/:id', shopControllers.getShopById);
 router.get('/:id/notifications', shopControllers.getNotifications);
 

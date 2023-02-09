@@ -1,7 +1,7 @@
 const path = require('path');
 
 const User = require(path.join(__dirname, '..', 'models', 'user.model'));
-const deleteImage = require(path.join(__dirname, '..', 'libs', 'dirLibrary'));
+const {deleteReqImages} = require(path.join(__dirname, '..', 'libs', 'dirLibrary'));
 
 const verifySignUp = {};
 
@@ -12,12 +12,7 @@ verifySignUp.checkDuplicate = (check, message) => {
         });
     
         if(isDuplicate) {
-            if(req.files[0]){
-                const { filename } = req.files[0];
-                const pathImage = path.join(__dirname, '..', 'public', 'images', filename);
-
-                deleteImage(pathImage);
-            }
+            deleteReqImages(req)
 
             return res.status(400).json({
                 message,
@@ -31,13 +26,10 @@ verifySignUp.checkDuplicate = (check, message) => {
 
 verifySignUp.validatePassword = async (req, res, next) => {
     const { password, validatePassword } = req.body;
+    console.log(password, validatePassword)
 
     if(password !== validatePassword) {
-        const { filename } = req.files[0];
-        const pathImage = path.join(__dirname, '..', 'public', 'images', filename);
-
-        deleteImage(pathImage);
-
+        deleteReqImages(req)
         return res.status(400).json({
             message: 'Las contraseñas no coinciden.'
         })

@@ -1,6 +1,7 @@
-const {Schema, model} = require('mongoose');
+const mongoose = require('mongoose');
+const deepPopulate = require('mongoose-deep-populate')(mongoose);
 
-const productSchema = new Schema({
+const productSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true
@@ -11,12 +12,12 @@ const productSchema = new Schema({
     },
     category: {
         ref: 'Category',
-        type: Schema.Types.ObjectId
+        type: mongoose.Schema.Types.ObjectId
     },
-    subcategories: [{
+    subCategory: {
         ref: 'SubCategory',
-        type: Schema.Types.ObjectId
-    }],
+        type: mongoose.Schema.Types.ObjectId
+    },
     tradable: {
         type: Boolean,
         required: true
@@ -36,18 +37,24 @@ const productSchema = new Schema({
     galleryImages: Array,   
     shop: {
         ref: "Shop",
-        type: Schema.Types.ObjectId
+        type: mongoose.Schema.Types.ObjectId
     },
     comments: [{
         ref: "Comment",
-        type: Schema.Types.ObjectId
+        type: mongoose.Schema.Types.ObjectId
     }],
     proposals: [{
         ref: "Proposal",
-        type: Schema.Types.ObjectId
-    }]
+        type: mongoose.Schema.Types.ObjectId
+    }],
+    finished: {
+        type: Boolean,
+        required: true
+    }
 }, {
     timestamps: true
 });
 
-module.exports = model('Product', productSchema);
+productSchema.plugin(deepPopulate)
+
+module.exports = mongoose.model('Product', productSchema);

@@ -20,17 +20,39 @@ productsControllers.getProducts = async (req, res) => {
     }
 }
 
+productsControllers.getProductsPerPage = async (req, res) => {
+    try {
+        const {page} = req.params;
+        const startIndex = page - 1;
+        const finishIndex = (page*20) -1;
+        const products = await Product.find().populate(['comments']);
+
+        const productsSliced = products.slice(startIndex, finishIndex)
+
+        res.status(200).send(productsSliced);
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send(error);
+    }
+}
+
 productsControllers.getProductsByCategory = async(req, res) => {
     try {
-        const { category } = req.params;
-        const categoryFinded = await Category.find({name: capitalize(category)});
+        const { category, page } = req.params;
+        const startIndex = page - 1;
+        const finishIndex = (page*20) -1;
+
+        const categoryFinded = await Category.find({name: category});
 
         if(!categoryFinded) return res.status(404).send("Categoría no encontrada");
 
         const categoryId = categoryFinded;
 
-        const productsFinded = await Product.find({category: categoryId});
-        res.status(200).send(productsFinded);
+        const products = await Product.find({category: categoryId});
+
+        const productsSliced = products.slice(startIndex, finishIndex)
+
+        res.status(200).send(productsSliced);
     } catch (error) {
         console.log(error);
         return res.status(500).send(error);
@@ -40,10 +62,7 @@ productsControllers.getProductsByCategory = async(req, res) => {
 productsControllers.getProductById = async(req, res) => {
     try {
         const {id} = req.params;
-        const product = await Product.findById(id).populate(['category', 'subcategories', 'comments']);
-
-        // await Product.updateMany({}, {stock: 5});
-
+        const product = await Product.findById(id).deepPopulate(['category', 'subCategory', 'comments', 'shop', 'proposals.user']);
         if(!product) res.status(404).send("Producto no encontrado");
 
         res.status(200).send(product);
@@ -174,7 +193,8 @@ productsControllers.createProduct = async (req, res) => {
             ...req.body,
             principalImage: `${process.env.ROOT_URL}/images/${filename}`,
             galleryImages: galleryImagesUrls,
-            shop: shopid
+            shop: shopid,
+            finished: false
         });
 
         await newProduct.save();

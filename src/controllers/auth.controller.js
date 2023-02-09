@@ -3,12 +3,13 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const User = require(path.join(__dirname, '..', 'models', 'user.model'));
 const Role = require(path.join(__dirname, '..', 'models', 'role.model'));
+const {deleteReqImages} = require(path.join(__dirname, '..', 'libs', 'dirLibrary'))
 
 const authController = {};
 
 authController.signUp = async (req, res) => {
     try {
-        const { filename } = req.files[0];
+        const { filename } = req.files.profileImage[0];
         const { password } = req.body;
         const userRole = await Role.findOne( { name: "user" } );
 
@@ -39,14 +40,8 @@ authController.signUp = async (req, res) => {
         });
         
     } catch (error) {
-        if(req.files && req.files.length > 0) {
-            req.files.forEach(el => {
-                fs.unlink(path.join(__dirname, '..', 'public', 'images', el.filename), (err) => {
-                    if(err) console.log(err);
-                });
-            });
-        };
-
+        deleteReqImages(req)
+        console.log(error)
         res.status(500).send({
             message: 'Error al registrar el usuario, intente de nuevo.',
         });
@@ -93,7 +88,7 @@ authController.identifyUserJSW = async (req, res) => {
 
         const user = await User.findById(decoded.id, {
             password: false
-        }).populate(['shop', 'shoppingHistory']);
+        }).deepPopulate([ 'shop.products' ,'shoppingHistory']);
 
         const rolesExist = await Role.find({_id: {$in: user.roles}}, {name: true});
 

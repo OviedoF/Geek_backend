@@ -1,21 +1,20 @@
 const {Schema, model} = require('mongoose');
 
 const proposalSchema = new Schema({
-    title: {
+    comment: {
         type: String,
-        required: true
-    },
-    description: {
-        type: String,
-        required: true
-    },
-    images: {
-        type: Array,
         required: true
     },
     amount: {
-        type: Number,
+        type: Number
+    },
+    product: {
+        type: Schema.Types.ObjectId,
+        ref: 'Product',
         required: true
+    },
+    images: {
+        type: Array
     },
     status: {
         type: String,
@@ -23,7 +22,8 @@ const proposalSchema = new Schema({
     },
     user: {
         type: Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: true
     }
 }, {
     timestamps: true

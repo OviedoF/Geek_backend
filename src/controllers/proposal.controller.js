@@ -3,8 +3,9 @@ const fs = require('fs');
 const Proposal = require(path.join(__dirname, '..', 'models', 'proposal.model'));
 const User = require(path.join(__dirname, '..', 'models', 'user.model'));
 const Product = require(path.join(__dirname, '..', 'models', 'product.model'));
-const {deleteImage} = require(path.join(__dirname, '..', 'libs', 'dirLibrary'));
+const {deleteImage, deleteReqImages} = require(path.join(__dirname, '..', 'libs', 'dirLibrary'));
 const proposalController = {};
+require('dotenv').config();
 
 proposalController.getProposals = async (req, res) => {
     try {
@@ -26,27 +27,28 @@ proposalController.getProposal = async (req, res) => {
 
 proposalController.createProposal = async (req, res) => {
     try {
-        const {title, description, amount, user, product} = req.body;
-        let images = [];
+        const body = req.body;
+        const images = [];
 
-        if (req.files[0]) {
-            req.files.forEach(file => {
-                images.push(file.filename);
+        if (req.files.images) {
+            req.files.images.forEach(file => {
+                const {filename} = file;
+                images.push(`${process.env.ROOT_URL}/images/${filename}`);
             });
         }
 
-        const proposal = new Proposal({title, description, images, amount, user});
+        body.images = images;
+        body.status = 'Pending';
 
-        await Product.findByIdAndUpdate(product, {$push: {proposals: proposal._id}});
+        const proposal = new Proposal(body);
+
+        await Product.findByIdAndUpdate(body.product, {$push: {proposals: proposal._id}});
 
         await proposal.save();
         res.status(200).json({message: 'Propuesta creada correctamente.'});
     } catch (error) {
-        if(req.files[0]) {
-            req.files.forEach(file => {
-                deleteImage(path.join(__dirname, '..', 'public', 'uploads', file.filename));
-            });
-        }
+        deleteReqImages(req);
+        console.log(error)
         res.status(500).json({message: 'Error al crear la propuesta.'});
     }
 }

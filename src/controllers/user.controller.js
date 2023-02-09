@@ -78,18 +78,18 @@ userController.updateWishList = async (req, res) => {
 userController.updateFollows = async (req, res) => {
     try {
         const {id} = req.params;
-        const {duviId} = req.body;
+        const {shopId} = req.body;
 
         const user = await User.findById(id, {follows: true});
-        console.log(user.follows.includes(duviId));
+        console.log(user.follows.includes(shopId));
 
-        if(!user.follows.includes(duviId)) {
-            const userFollows = await User.findByIdAndUpdate(id, { '$addToSet': { 'follows': duviId } }, {new: true});
+        if(!user.follows.includes(shopId)) {
+            const userFollows = await User.findByIdAndUpdate(id, { '$addToSet': { 'follows': shopId } }, {new: true});
             res.status(200).send(userFollows.follows);
         }
 
-        if(user.follows.includes(duviId)) {
-            const userFollows = await User.findByIdAndUpdate(id, { '$pull': { 'follows': duviId } }, {new: true});
+        if(user.follows.includes(shopId)) {
+            const userFollows = await User.findByIdAndUpdate(id, { '$pull': { 'follows': shopId } }, {new: true});
             res.status(200).send(userFollows.follows);
         }
     } catch (error) {
@@ -122,7 +122,7 @@ userController.updateShoppingCart = async (req, res) => {
 userController.getFollows = async (req, res) => {
     try {
         const {id} = req.params;
-        const user = await User.findById(id, {follows: true}).populate('follows');
+        const user = await User.findById(id, {follows: true}).deepPopulate(['follows']);
         res.status(200).send(user.follows);
     } catch (error) {
         console.log(error);

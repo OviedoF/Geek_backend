@@ -4,8 +4,9 @@ const router = express.Router();
 const productsControllers = require(path.join(__dirname, '..', 'controllers', 'products.controller'));
 
 router.get('/', productsControllers.getProducts);
-router.get('/category/:category', productsControllers.getProductsByCategory);
+router.get('/category/:category/:page', productsControllers.getProductsByCategory);
 router.get('/:id', productsControllers.getProductById);
+router.get('/page/:id', productsControllers.getProductsPerPage)
 
 router.post('/filters', productsControllers.filterAndGetProducts);
 router.post('/', productsControllers.createProduct);

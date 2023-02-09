@@ -13,7 +13,7 @@ const config = multer({
     storage: storage,
     dest: path.join(__dirname, 'public', 'images'),
     fileFilter: (req, file, cb) => {
-        const fileTypes = /jpeg|jpg|png|gif|webp|jfif/; // Tipos de imágenes permitidas
+        const fileTypes = /jpeg|jpg|png|gif|webp|jfif|avif|JPEG|JPG|PNG|GIF|WEBP|JFIF|AVIF/; // Tipos de imágenes permitidas
         const mimeType = fileTypes.test(file.mimetype);
         const extName = fileTypes.test(path.extname(file.originalname)); // Testeo de tipos
 
@@ -26,9 +26,9 @@ const config = multer({
 }).fields([
     {name: 'profileImage', maxCount: 1},
     {name: 'bannerImage', maxCount: 1},
-    {name: 'images', maxCount: 10},
     {name: 'principalImage', maxCount: 1},
-    {name: 'galleryImages', maxCount: 5}
+    {name: 'galleryImages', maxCount: 5},
+    {name: 'images', maxCount: 20},
 ]);
 
 module.exports = config;

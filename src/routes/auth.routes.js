@@ -18,7 +18,6 @@ const configMulter = require(path.join(__dirname, '..', 'config', 'multer.config
 router.post(
   "/register",
   [
-    validatePassword,
     checkDuplicate(
       "email",
       "Email ya existente, por favor entre en su cuenta."
