@@ -14,7 +14,9 @@ changePasswordController.createCode = async (req, res) => {
         const abrevCode = code.slice(0, 6);
 
         const user = await User.findOne({email});
-        if(!user) return res.status(404).send('No se ha encontrado el usuario.');
+        if(!user) return res.status(404).send({
+            message: 'No se ha encontrado un usuario asociado a ese email.'
+        });
 
         const currentRequest = await ChangePasswordRequest.findOne({email: email});
         if(currentRequest) await ChangePasswordRequest.findByIdAndDelete(currentRequest._id);
@@ -42,8 +44,8 @@ changePasswordController.createCode = async (req, res) => {
         <div styles="border-radius: 20px;">
             <h1 style="padding: 10px; text-align: center; font-weight: 200;">Solicitud de cambio de contraseña</h1>
             <p style="font-size: 20px;  padding: 10px;">
-                Hemos recibido una solicitud de cambio de contraseña para tu usuario de Duvi. Si crees que este correo es un error, por favor ignóralo. Por el contrario, usa el siguiente código
-                en la ventana de <a style="font-size: 20px;" href="">duvi.com</a> para poder cambiar tu contraseña con éxito, recuerda distinguir entre mayúsculas y minúsculas. 
+                Hemos recibido una solicitud de cambio de contraseña para tu usuario de Geek4Dummies. Si crees que este correo es un error, por favor ignóralo. Por el contrario, usa el siguiente código
+                en la ventana de <a style="font-size: 20px;" href="">app.geek4dummies.com</a> para poder cambiar tu contraseña con éxito, recuerda distinguir entre mayúsculas y minúsculas. 
                 Muchas gracias por confiar en nosotros! 
             </p>
 
@@ -51,14 +53,14 @@ changePasswordController.createCode = async (req, res) => {
 
             <p style="font-size: 20px;  padding: 10px;">
                 Si no has solicitado este cambio de contraseña o tienes algún problema, no dudes en contactarnos mediante la sección de "ayuda" de la página principal o 
-                enviando un correo electrónico a <a style="font-size: 20px;" href="">duviapp@eiche.cl</a>
+                enviando un correo electrónico a <a style="font-size: 20px;" href="">soporte@geek4dummies.com</a>
             </p>
         </div>` 
 
         const emailSended = await transporter.sendMail({
-            from: `'Duvi APP' <${process.env.MAIL_USERNAME}>`,
+            from: `'Geek4Dummies APP' <${process.env.MAIL_USERNAME}>`,
             to: newRequest.email,
-            subject: 'Duvi APP - Solicitud de cambio de contraseña',
+            subject: 'Geek4Dummies APP - Solicitud de cambio de contraseña',
             html: messageHtml
         })
 
@@ -72,6 +74,10 @@ changePasswordController.createCode = async (req, res) => {
         });
     } catch (error) {
         console.log(error);
+        res.status(500).send({
+            message: 'Ha ocurrido un error indefinido, intente más tarde.',
+            err
+        })
     }
 };
 
