@@ -3,7 +3,7 @@ require('dotenv').config();
 const User = require(path.join(__dirname, '..', 'models', 'user.model'));
 const Shop = require(path.join(__dirname, '..', 'models', 'shop.model'));
 const Role = require(path.join(__dirname, '..', 'models', 'role.model'));
-const deleteImage = require(path.join(__dirname, '..', 'libs', 'dirLibrary'));
+const {deleteImage, deleteReqImages} = require(path.join(__dirname, '..', 'libs', 'dirLibrary'));
 
 const userController = {};
 
@@ -30,25 +30,29 @@ userController.getUserById = async (req, res) => {
 userController.updateUser = async (req, res) => {
     try {
         const {id} = req.params;
+        const body = req.body;
         const userFinded = await User.findById(id);
 
         if(!userFinded) return res.status(404).send('No se ha podido encontrar el usuario.');
 
-        if(req.files[0]){
+        if(req.files && req.files.profileImage){
             const oldImageName = userFinded.userImage.split('/images/')[1] || userFinded.userImage.split('/image/upload/')[1];
             console.log(oldImageName)
             const routeImagesFolder = path.join(__dirname, '..', 'public', 'images', oldImageName);
             deleteImage(routeImagesFolder);
 
-            const {filename} = req.files[0];
-            await User.findByIdAndUpdate(id, { userImage: `${process.env.ROOT_URL}/images/${filename}` });
+            const {filename} = req.files.profileImage[0];
+            body.userImage = `${process.env.ROOT_URL}/images/${filename}`;
         }
 
-        const userUpdated = await User.findByIdAndUpdate(id, req.body);
+        const userUpdated = await User.findByIdAndUpdate(id, body, {new: true}).deepPopulate([ 'shop.products' ,'shoppingHistory']);
         res.status(200).send(userUpdated);
     } catch (error) {
+        deleteReqImages(req)
         console.log(error);
-        res.status(500).send(error);
+        res.status(500).send({
+            message: 'Ha ocurrido un error indefinido al actualizar el usuario.'
+        });
     }
 }
 

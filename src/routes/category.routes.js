@@ -10,7 +10,7 @@ router.get('/:id', categoriesControllers.getCategoryById);
 
 router.post('/', isAdmin, categoriesControllers.createCategory);
 
-router.put('/update/:id', isAdmin, categoriesControllers.updateCategory);
+router.put('/:id', isAdmin, categoriesControllers.updateCategory);
 
 router.delete('/delete/:id', isAdmin, categoriesControllers.deleteCategory);
 

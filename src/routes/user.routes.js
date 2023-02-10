@@ -16,7 +16,6 @@ router.get('/:id/notifications', userController.getNotifications);
 
 router.put('/:id',
 [
-  validatePassword,
   checkDuplicate(
     "email",
     "El email sigue siendo el mismo, por favor desmarque esa casilla.."
@@ -24,10 +23,6 @@ router.put('/:id',
   checkDuplicate(
     "username",
     "Nombre de usuario ya registrado, regístrese con uno diferente."
-  ),
-  checkDuplicate(
-    "userId",
-    "Identificador de usuario ya asignado a una cuenta."
   )
 ], userController.updateUser)
 
