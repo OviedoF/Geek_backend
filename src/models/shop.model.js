@@ -17,7 +17,11 @@ const shopSchema = new Schema({
         type: String,
         required: true
     },
-    city: {
+    region: {
+        type: String,
+        required: true
+    },
+    comunne: {
         type: String,
         required: true
     },
@@ -25,7 +29,7 @@ const shopSchema = new Schema({
         type: String,
         required: true
     },
-    socialMedia: {
+    social_media: {
         website: String,
         whatsapp: String,
         facebook: String,

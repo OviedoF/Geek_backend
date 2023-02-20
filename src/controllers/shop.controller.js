@@ -3,6 +3,7 @@ require('dotenv').config();
 const User = require(path.join(__dirname, '..', 'models', 'user.model'));
 const Shop = require(path.join(__dirname, '..', 'models', 'shop.model'));
 const {deleteReqImages, deleteImage} = require(path.join(__dirname, '..', 'libs', 'dirLibrary'));
+const Role = require(path.join(__dirname, '..', 'models', 'role.model'));
 
 const shopController = {};
 
@@ -40,6 +41,8 @@ shopController.createShop = async (req, res) => {
     try {
         const {userid} = req.headers;
         const body = JSON.parse(req.body.form);
+
+        console.log(body);
 
         const user = await User.findById(userid);
 
@@ -93,9 +96,18 @@ shopController.updateShop = async (req, res) => {
 
         const updatedshop = await Shop.findByIdAndUpdate(id, body, {new: true});
 
-        const user = await User.findById(userid).populate(['shop']);
+        const user = await User.findById(userid).deepPopulate([ 'shop.products' ,'shoppingHistory']);;
+        const rolesExist = await Role.find({_id: {$in: user.roles}}, {name: true});
 
-        res.status(200).send(user);
+        const userRoles = rolesExist.map(el => el.name);
+
+        const userToSend = {
+            ...user._doc,
+            roles: userRoles
+        }
+        
+
+        res.status(200).send(userToSend);
     } catch (error) {
         console.log(error);
         res.status(500).send(error);
