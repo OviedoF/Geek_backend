@@ -63,6 +63,7 @@ productsControllers.getProductById = async(req, res) => {
     try {
         const {id} = req.params;
         const product = await Product.findById(id).deepPopulate(['category', 'subCategory', 'comments', 'shop', 'proposals.user']);
+        
         if(!product) res.status(404).send("Producto no encontrado");
 
         res.status(200).send(product);

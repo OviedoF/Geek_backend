@@ -9,7 +9,7 @@ router.get('/:id', subCategoriesControllers.getSubcategoryById);
 router.get('/category/:category', subCategoriesControllers.getSubcategoryByFather);
 
 router.post('/', isAdmin, subCategoriesControllers.createSubCategory);
-router.put('/update/:id', isAdmin, subCategoriesControllers.updateSubCategory);
+router.put('/:id', isAdmin, subCategoriesControllers.updateSubCategory);
 
 router.delete('/:id', isAdmin, subCategoriesControllers.deleteSubCategory);
 

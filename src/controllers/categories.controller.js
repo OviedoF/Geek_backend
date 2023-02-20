@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs-extra');
 const Category = require(path.join(__dirname, '..', 'models', 'category.model.js'));
 const Subcategory = require(path.join(__dirname, '..', 'models', 'subcategory.model.js'));
-const deleteImage = require(path.join(__dirname, '..', 'libs', 'dirLibrary'));
+const {deleteImage, deleteReqImages} = require(path.join(__dirname, '..', 'libs', 'dirLibrary'));
 const { capitalize } = require(path.join(__dirname, '..', 'libs', 'textHelpers'));
 require('dotenv').config();
 
@@ -59,24 +59,26 @@ categoriesControllers.updateCategory = async (req, res) => {
     try {
         const { id } = req.params;
         const CategoryFinded = await Category.findById(id);
+        const body = req.body;
 
         if(!CategoryFinded) {
             return res.status(404).send('No se ha encontrado la categoría.');
         };
 
-        if(req.files[0]) {
+        if(req.files && req.files.images) {
             const oldImageName = CategoryFinded.imageUrl.split('/images/')[1];
             const routeImagesFolder = path.join(__dirname, '..', 'public', 'images', oldImageName);
             deleteImage(routeImagesFolder);
 
-            const {filename} = req.files[0];
-            await Category.findByIdAndUpdate(id, { imageUrl: `${process.env.ROOT_URL}/images/${filename}` });
+            const {filename} = req.files.images[0];
+            body.imageUrl = `${process.env.ROOT_URL}/images/${filename}` 
         };
 
         const categoryActualized = await Category.findByIdAndUpdate(id, req.body, {new: true}).populate('subCategories');
 
         res.status(200).send(categoryActualized);
     } catch (error) {
+        deleteReqImages(req)
         console.log(error);
         return res.status(500).send(error);
     }
