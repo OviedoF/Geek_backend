@@ -50,7 +50,11 @@ const productSchema = new mongoose.Schema({
     finished: {
         type: Boolean,
         required: true
-    }
+    },
+    inProcess: {
+        type: Boolean,
+        required: true
+    },
 }, {
     timestamps: true
 });

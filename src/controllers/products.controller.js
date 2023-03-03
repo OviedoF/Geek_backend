@@ -4,7 +4,7 @@ const Product = require(path.join(__dirname, '..', 'models', 'product.model.js')
 const Category = require(path.join(__dirname, '..', 'models', 'category.model.js'));
 const { capitalize } = require(path.join(__dirname, '..', 'libs', 'textHelpers'));
 const Shop = require(path.join(__dirname, '..', 'models', 'shop.model'));
-const {deleteReqImages} = require(path.join(__dirname, '..', 'libs', 'dirLibrary')); 
+const {deleteReqImages, deleteImage} = require(path.join(__dirname, '..', 'libs', 'dirLibrary')); 
 require('dotenv').config();
 
 const productsControllers = {};
@@ -195,7 +195,8 @@ productsControllers.createProduct = async (req, res) => {
             principalImage: `${process.env.ROOT_URL}/images/${filename}`,
             galleryImages: galleryImagesUrls,
             shop: shopid,
-            finished: false
+            finished: false,
+            inProcess: false
         });
 
         await newProduct.save();
@@ -223,6 +224,33 @@ productsControllers.updateProduct = async (req, res) => {
     try {
         const {id} = req.params;
         const productFinded = await Product.findById(id)
+        
+        if(req.files.principalImage) {
+            const {filename} = req.files.principalImage[0];
+            const oldImage = productFinded.principalImage.split('/images/')[1];
+            const oldImageRoute = path.join(__dirname, '..', 'public', 'images', oldImage);
+            deleteImage(oldImageRoute);
+
+            req.body.principalImage = `${process.env.ROOT_URL}/images/${filename}`;
+        }
+
+        if(req.files.galleryImages) {
+            const galleryImages = req.files.galleryImages;
+            const galleryImagesUrls = [];
+
+            galleryImages.forEach(image => {
+                const {filename} = image;
+                galleryImagesUrls.push(`${process.env.ROOT_URL}/images/${filename}`);
+            })
+
+            productFinded.galleryImages.forEach(image => {
+                const oldImage = image.split('/images/')[1];
+                const oldImageRoute = path.join(__dirname, '..', 'public', 'images', oldImage);
+                deleteImage(oldImageRoute);
+            })  // Eliminamos las imágenes anteriores
+
+            req.body.galleryImages = galleryImagesUrls;
+        }
 
         if(!productFinded) return res.status(404).send("Producto no encontrado");
 

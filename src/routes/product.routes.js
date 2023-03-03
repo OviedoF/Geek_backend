@@ -12,6 +12,7 @@ router.post('/filters', productsControllers.filterAndGetProducts);
 router.post('/', productsControllers.createProduct);
 router.post('/:id/addImage', productsControllers.pushImage);
 
+router.put('/:id', productsControllers.updateProduct);
 router.put('/:id/principalImage', productsControllers.updatePrincipalImage);
 
 router.delete('/:id/:filename', productsControllers.removeImage);

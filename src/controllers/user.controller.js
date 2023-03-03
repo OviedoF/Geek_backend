@@ -46,7 +46,16 @@ userController.updateUser = async (req, res) => {
         }
 
         const userUpdated = await User.findByIdAndUpdate(id, body, {new: true}).deepPopulate([ 'shop.products' ,'shoppingHistory']);
-        res.status(200).send(userUpdated);
+
+        const rolesExist = await Role.find({_id: {$in: userUpdated.roles}}, {name: true});
+
+        const userRoles = rolesExist.map(el => el.name);
+
+        res.status(200).send({
+            ...userUpdated._doc,
+            password: undefined,
+            roles: userRoles
+        });
     } catch (error) {
         deleteReqImages(req)
         console.log(error);

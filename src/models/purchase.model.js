@@ -5,10 +5,6 @@ const purchaseSchema = new Schema({
     type: String,
     required: true,
   },
-  invoice: {
-    ref: "PaymentInvoice",
-    type: Schema.Types.ObjectId
-  },
   buyer: {
     type: Schema.Types.ObjectId,
     ref: "User",
@@ -19,9 +15,25 @@ const purchaseSchema = new Schema({
     ref: "Shop",
     required: true,
   },
-  images: [String],
-  products: Array,
-  type: String
+  product: {
+    type: Schema.Types.ObjectId,
+    ref: "Product",
+  },
+  rupies: Boolean,
+  amount: Number,
+  trade: Boolean,
+  shippingBuyer: {
+    state: String,
+    city: String,
+    address: String,
+    code: String,
+  },
+  shippingSeller: {
+    state: String,
+    city: String,
+    address: String,
+    code: String,
+  },
 }, {
     timestamps: true,
     timeseries: true

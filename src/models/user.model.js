@@ -55,7 +55,9 @@ const userSchema = new mongoose.Schema({
     }],
 
     wallet: {
-        balance: Number
+        balance: Number,
+        pending: Number,
+        readyPay: Boolean,
     },
 
     notifications: [{
